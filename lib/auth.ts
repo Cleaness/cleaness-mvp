@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
-export function isAuthed() {
-  const cookieStore = cookies();
+export async function isAuthed() {
+  const cookieStore = await cookies();
   const auth = cookieStore.get("admin-auth");
   return auth?.value === "true";
 }
