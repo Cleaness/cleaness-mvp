@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum BookingSource {
+  ADMIN
+  ONLINE
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  phone     String   @unique
+  email     String?  // NICHT unique, weil E-Mails doppelt vorkommen können
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings  Booking[]
+}
+
+model ServiceType {
+  id              String   @id @default(cuid())
+  displayName     String
+  baseName        String
+  durationMinutes Int
+  isOnlineBookable Boolean @default(false)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  bookings        Booking[]
+}
+
+model Booking {
+  status        BookingStatus @default(ACTIVE)
+  id            String        @id @default(cuid())
+  startAt       DateTime
+  endAt         DateTime
+  notes         String?
+  source        BookingSource @default(ADMIN)
+
+  customerId    String
+  serviceTypeId String
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  serviceType   ServiceType   @relation(fields: [serviceTypeId], references: [id])
+
+  @@index([startAt])
+  @@index([endAt])
+  @@index([customerId])
+  @@index([serviceTypeId])
+}
+
+enum BookingStatus {
+  ACTIVE
+  CANCELED
+}
