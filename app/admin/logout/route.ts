@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
-import { logout } from "@/lib/auth";
 
-export async function POST(req: Request) {
-  logout();
-  return NextResponse.redirect(new URL("/admin", req.url));
+export async function POST() {
+  const res = NextResponse.json({ ok: true });
+
+  // Cookie löschen (Admin-Login)
+  res.cookies.set("admin", "", { path: "/", maxAge: 0 });
+
+  return res;
 }
